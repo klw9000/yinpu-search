@@ -146,6 +146,7 @@ header h1 {
     overflow: hidden;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s, box-shadow 0.3s;
+    cursor: zoom-in;
 }
 
 .seal-card:hover {
@@ -222,6 +223,60 @@ header h1 {
     padding: 40px;
     color: #888;
 }
+
+.lightbox {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.88);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 40px 20px;
+    cursor: zoom-out;
+}
+
+.lightbox.open {
+    display: flex;
+}
+
+.lightbox img {
+    max-width: 95vw;
+    max-height: 85vh;
+    object-fit: contain;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+    background: #fff;
+}
+
+.lightbox-caption {
+    margin-top: 16px;
+    color: #f0f0f0;
+    font-size: 1rem;
+    text-align: center;
+    max-width: 90vw;
+    word-break: break-all;
+}
+
+.lightbox-close {
+    position: absolute;
+    top: 20px;
+    right: 24px;
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.lightbox-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
     </style>
 </head>
 <body>
@@ -245,6 +300,12 @@ header h1 {
         <div id="results" class="results-container">
             <div class="loading">正在加载印章列表...</div>
         </div>
+    </div>
+
+    <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-label="印章大图">
+        <button type="button" class="lightbox-close" aria-label="关闭">&times;</button>
+        <img id="lightboxImg" alt="">
+        <div id="lightboxCaption" class="lightbox-caption"></div>
     </div>
 
     <script>
@@ -289,6 +350,28 @@ async function init() {
     document.getElementById('searchInput').addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
             performSearch();
+        }
+    });
+
+    resultsEl.addEventListener('click', (e) => {
+        const card = e.target.closest('.seal-card');
+        if (!card) return;
+        const img = card.querySelector('.seal-image');
+        const nameEl = card.querySelector('.seal-name');
+        if (img && img.src) {
+            openLightbox(img.src, nameEl ? nameEl.textContent : '');
+        }
+    });
+
+    const lightbox = document.getElementById('lightbox');
+    lightbox.addEventListener('click', (e) => {
+        if (e.target === lightbox || e.target.classList.contains('lightbox-close')) {
+            closeLightbox();
+        }
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && lightbox.classList.contains('open')) {
+            closeLightbox();
         }
     });
 
@@ -451,8 +534,8 @@ function renderPagination() {
     html += `<button ${currentPage === 0 ? 'disabled' : ''} onclick="goToPage(${currentPage - 1})">上一页</button>`;
     
     for (let i = 0; i < totalPages; i++) {
-        const char = searchResults[i].char;
-        html += `<button class="${currentPage === i ? 'active' : ''}" onclick="goToPage(${i})">${char}</button>`;
+        const { char, seals } = searchResults[i];
+        html += `<button class="${currentPage === i ? 'active' : ''}" onclick="goToPage(${i})">${char} (${seals.length})</button>`;
     }
     
     html += `<button ${currentPage === totalPages - 1 ? 'disabled' : ''} onclick="goToPage(${currentPage + 1})">下一页</button>`;
@@ -466,6 +549,22 @@ function goToPage(page) {
     currentPage = page;
     renderResults();
     renderPagination();
+}
+
+function openLightbox(src, caption) {
+    const lightbox = document.getElementById('lightbox');
+    document.getElementById('lightboxImg').src = src;
+    document.getElementById('lightboxImg').alt = caption || '';
+    document.getElementById('lightboxCaption').textContent = caption || '';
+    lightbox.classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+    const lightbox = document.getElementById('lightbox');
+    lightbox.classList.remove('open');
+    document.getElementById('lightboxImg').src = '';
+    document.body.style.overflow = '';
 }
 
 init();
