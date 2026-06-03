@@ -1,4 +1,4 @@
-const CACHE_NAME = 'yinpu-search-v3';
+const CACHE_NAME = 'yinpu-search-v4';
 const urlsToCache = [
   './',
   './index.html',
@@ -6,14 +6,33 @@ const urlsToCache = [
   './seals.json'
 ];
 
-// Paths handled with a network-first strategy: try the network so the
-// user always sees the freshest version when online, and refresh the
-// cache so the offline copy stays current; fall back to cache when
-// offline. Everything else stays cache-first.
+// Strategy per resource type. Rationale lives in
+// docs/adr/0001-caching-strategy.md.
+//
+// - network-first: small, mutable, URL-stable data (the seal manifest).
+//   Always tries network so updates appear immediately when online,
+//   falls back to cache offline.
+//
+// - stale-while-revalidate (SWR): the HTML document. Serves cached
+//   shell instantly, then refreshes in the background so the next
+//   visit sees any code changes — no CACHE_NAME bump needed for
+//   most updates.
+//
+// - cache-first (default): immutable URL-addressed assets — seal
+//   images, icons, manifest. Once cached, never re-fetched while
+//   the cache is valid.
+
 const NETWORK_FIRST = ['/seals.json'];
 
 function isNetworkFirst(url) {
   return NETWORK_FIRST.some(p => url.pathname.endsWith(p));
+}
+
+function isStaleWhileRevalidate(request, url) {
+  // Top-level page navigations and any .html document.
+  return request.mode === 'navigate'
+    || url.pathname.endsWith('.html')
+    || url.pathname.endsWith('/');
 }
 
 self.addEventListener('install', event => {
@@ -32,6 +51,11 @@ self.addEventListener('fetch', event => {
     return;
   }
 
+  if (isStaleWhileRevalidate(event.request, url)) {
+    event.respondWith(staleWhileRevalidate(event.request));
+    return;
+  }
+
   event.respondWith(cacheFirst(event.request));
 });
 
@@ -45,6 +69,21 @@ function networkFirst(request) {
       return response;
     })
     .catch(() => caches.match(request));
+}
+
+function staleWhileRevalidate(request) {
+  return caches.match(request).then(cached => {
+    const networkFetch = fetch(request)
+      .then(response => {
+        if (response && response.status === 200 && response.type === 'basic') {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
+        }
+        return response;
+      })
+      .catch(() => cached);
+    return cached || networkFetch;
+  });
 }
 
 function cacheFirst(request) {
