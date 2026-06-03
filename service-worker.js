@@ -1,8 +1,9 @@
-const CACHE_NAME = 'yinpu-search-v1';
+const CACHE_NAME = 'yinpu-search-v2';
 const urlsToCache = [
   './',
   './index.html',
-  './manifest.json'
+  './manifest.json',
+  './seals.json'
 ];
 
 self.addEventListener('install', event => {

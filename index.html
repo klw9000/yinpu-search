@@ -248,95 +248,6 @@ header h1 {
     </div>
 
     <script>
-const sealFiles = [
-    "一念如初-边款.jpg",
-    "一念如初.jpg",
-    "不容易.jpg",
-    "与人玫瑰手有余香.jpg",
-    "与明白人言.jpg",
-    "且接人间二两墨-边款.jpg",
-    "且接人间二两墨.jpg",
-    "丹青难写是精神.jpg",
-    "乐天.jpg",
-    "云在青天水在瓶-边款.jpg",
-    "云在青天水在瓶.jpg",
-    "人生若只如初见-印面.jpg",
-    "人生若只如初见-边款.jpg",
-    "人生若只如初见.jpg",
-    "人间成败不须惊.jpg",
-    "似我儿时上学天-边款.jpg",
-    "似我儿时上学天.jpg",
-    "但从心底祝平安-边款.jpg",
-    "但从心底祝平安.jpg",
-    "但从心底祝平安A.jpg",
-    "但愿人长久千里共婵娟-边款.jpg",
-    "但愿人长久千里共婵娟.jpg",
-    "但求无愧我心-边款.jpg",
-    "但求无愧我心.jpg",
-    "低首为公拜榻前-边款.jpg",
-    "低首为公拜榻前.jpg",
-    "写尽半生皆是错-边款.jpg",
-    "别是一般滋味.jpg",
-    "半称心-边款.jpg",
-    "半称心.jpg",
-    "又日新-印.jpg",
-    "又日新-边款.jpg",
-    "又日新.jpg",
-    "只争朝夕.jpg",
-    "只记花开不记年.jpg",
-    "唯有杜康-边款.jpg",
-    "唯有杜康.jpg",
-    "坐看云起时-边款.jpg",
-    "坐看云起时.jpg",
-    "天地元黄喊一年-边款.jpg",
-    "天地元黄喊一年.jpg",
-    "天行健.jpg",
-    "学贵有恒.jpg",
-    "小楼一夜-印面.jpg",
-    "小楼一夜-边款.jpg",
-    "小楼一夜.jpg",
-    "尚能饭-边款.jpg",
-    "尚能饭.jpg",
-    "往往醉后-边款.jpg",
-    "往往醉后.jpg",
-    "心画.jpg",
-    "悲喜自渡.jpg",
-    "意在笔先.jpg",
-    "愿你们平安-边款.jpg",
-    "愿你们平安.jpg",
-    "我将无我-印面.jpg",
-    "我将无我.jpg",
-    "春在枝头已十分-边款.jpg",
-    "春在枝头已十分.jpg",
-    "沉也坦然.jpg",
-    "浮也淡然.jpg",
-    "犹未能-印面.jpg",
-    "犹未能.jpg",
-    "王守桢刻.jpg",
-    "白云深处.jpg",
-    "真佛只说家常话-印章.jpg",
-    "真佛只说家常话-印面.jpg",
-    "真佛只说家常话.jpg",
-    "真金不镀-边款.jpg",
-    "真金不镀.jpg",
-    "知不足-边款.jpg",
-    "知不足.jpg",
-    "知我者二三子-印面.jpg",
-    "知我者二三子-边款.jpg",
-    "知我者二三子.jpg",
-    "笔不尽意-边款.jpg",
-    "笔不尽意.jpg",
-    "自怡悦.jpg",
-    "行到水穷处-边款.jpg",
-    "行到水穷处.jpg",
-    "赵朴初-边款.jpg",
-    "赵朴初.jpg",
-    "醉石翁.jpg",
-    "随遇而安.jpg",
-    "雕塑人生-边款.jpg",
-    "雕塑人生.jpg"
-];
-
 let allSeals = [];
 let searchResults = [];
 let currentPage = 0;
@@ -345,18 +256,31 @@ let isGalleryMode = false;
 let galleryPage = 0;
 const galleryPerPage = 20;
 
-function init() {
-    allSeals = sealFiles.map(file => {
-        const nameWithoutExt = file.replace(/\.[^/.]+$/, "");
-        return {
-            filename: file,
-            name: nameWithoutExt
-        };
-    });
+async function init() {
+    const resultsEl = document.getElementById('results');
 
-    document.getElementById('results').innerHTML = `
+    try {
+        const resp = await fetch('./seals.json', { cache: 'no-cache' });
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        const sealFiles = await resp.json();
+        allSeals = sealFiles.map(file => ({
+            filename: file,
+            name: file.replace(/\.[^/.]+$/, "")
+        }));
+    } catch (err) {
+        resultsEl.innerHTML = `
+            <div class="no-results">
+                <p>加载印章列表失败：${err.message}</p>
+                <p style="margin-top:10px;font-size:0.9rem;color:#aaa;">请检查 seals.json 是否存在，或重新运行 scripts/generate-seals.sh</p>
+            </div>
+        `;
+        return;
+    }
+
+    resultsEl.innerHTML = `
         <div class="welcome-message">
             <p>欢迎使用印谱搜索！在上方输入框中输入汉字开始搜索。</p>
+            <p style="margin-top:10px;font-size:0.9rem;color:#aaa;">共 ${allSeals.length} 个印章可供检索</p>
         </div>
     `;
 
