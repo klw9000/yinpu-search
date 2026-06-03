@@ -1,9 +1,16 @@
-const CACHE_NAME = 'yinpu-search-v4';
+const CACHE_NAME = 'yinpu-search-v5';
 const urlsToCache = [
   './',
   './index.html',
   './manifest.json',
-  './seals.json'
+  './seals.json',
+  './icons/apple-touch-icon-180.png',
+  './icons/apple-touch-icon-167.png',
+  './icons/apple-touch-icon-152.png',
+  './icons/apple-touch-icon-120.png',
+  './icons/icon-192.png',
+  './icons/icon-512.png',
+  './icons/icon-512-maskable.png'
 ];
 
 // Strategy per resource type. Rationale lives in

@@ -2,13 +2,19 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#8B0000">
     <title>印谱搜索</title>
     <link rel="manifest" href="./manifest.json">
-    <link rel="apple-touch-icon" href="./icons/icon-192.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon-180.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="./icons/apple-touch-icon-167.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="./icons/apple-touch-icon-152.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="./icons/apple-touch-icon-120.png">
+    <link rel="apple-touch-icon" href="./icons/apple-touch-icon-180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="./icons/icon-512.png">
     <style>
 * {
     margin: 0;
@@ -276,6 +282,130 @@ header h1 {
 
 .lightbox-close:hover {
     background: rgba(255, 255, 255, 0.3);
+}
+
+/* ---------- Responsive ---------- */
+
+/* Fluid type for the title across all sizes. */
+header h1 {
+    font-size: clamp(1.7rem, 5.5vw, 2.5rem);
+}
+
+/* Disable hover lift on touch devices — otherwise the transform sticks
+   after a tap and looks broken on phones. */
+@media (hover: none) {
+    .seal-card:hover {
+        transform: none;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    .pagination button:hover:not(:disabled) {
+        background: white;
+        color: inherit;
+        border-color: #ddd;
+    }
+    .pagination button.active,
+    .pagination button:active {
+        background: #8B0000;
+        color: white;
+        border-color: #8B0000;
+    }
+}
+
+/* Tablets & narrower laptops / foldable inner display. */
+@media (max-width: 1023px) {
+    .container { padding: 28px 16px; }
+    header { margin-bottom: 28px; }
+    .search-section { padding: 22px; }
+    .results-container { padding: 22px; }
+    .seal-grid {
+        grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+        gap: 16px;
+    }
+    .seal-image { height: 180px; }
+}
+
+/* Phones (portrait) + foldable outer display. */
+@media (max-width: 640px) {
+    .container { padding: 16px 12px; }
+    header { margin-bottom: 18px; }
+    .subtitle { font-size: 0.95rem; }
+
+    .search-section,
+    .results-container { padding: 16px; }
+
+    /* Stack: full-width input on row 1, two buttons share row 2. */
+    .search-box { flex-wrap: wrap; gap: 8px; }
+    #searchInput {
+        flex-basis: 100%;
+        padding: 12px 14px;
+        font-size: 16px; /* keep 16px to suppress iOS auto-zoom on focus */
+    }
+    #searchBtn, #galleryBtn {
+        flex: 1;
+        padding: 12px 0;
+        font-size: 15px;
+    }
+
+    .hint { font-size: 0.8rem; margin-top: 10px; }
+
+    .char-section { margin-bottom: 24px; }
+    .char-title {
+        font-size: 1.15rem;
+        margin-bottom: 14px;
+        padding-bottom: 8px;
+    }
+
+    .seal-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 10px;
+    }
+    .seal-image { height: 140px; padding: 6px; }
+    .seal-name { padding: 8px; font-size: 0.85rem; }
+
+    .pagination {
+        padding: 12px;
+        gap: 6px;
+    }
+    .pagination button {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+    }
+
+    /* Lightbox: respect notch / dynamic island via safe-area. */
+    .lightbox { padding: 20px 12px; }
+    .lightbox img { max-width: 96vw; max-height: 78vh; }
+    .lightbox-caption { font-size: 0.9rem; margin-top: 10px; }
+    .lightbox-close {
+        top: calc(12px + env(safe-area-inset-top, 0px));
+        right: calc(12px + env(safe-area-inset-right, 0px));
+        width: 40px;
+        height: 40px;
+        font-size: 22px;
+    }
+}
+
+/* Very narrow: small phones, foldable closed cover (~280–360px). */
+@media (max-width: 380px) {
+    .container { padding: 12px 8px; }
+    .search-section,
+    .results-container { padding: 12px; }
+    .seal-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 8px;
+    }
+    .seal-image { height: 120px; }
+    .pagination button {
+        padding: 7px 10px;
+        font-size: 0.85rem;
+    }
+}
+
+/* Phone in landscape: cap lightbox image by height, not viewport width,
+   so the close button doesn't fight for space with the image. */
+@media (max-height: 500px) and (orientation: landscape) {
+    .lightbox { padding: 12px 60px; }
+    .lightbox img { max-height: 80vh; }
+    .lightbox-caption { display: none; }
 }
     </style>
 </head>
