@@ -16,9 +16,11 @@ const urlsToCache = [
 // Strategy per resource type. Rationale lives in
 // docs/adr/0001-caching-strategy.md.
 //
-// - network-first: small, mutable, URL-stable data (the seal manifest).
-//   Always tries network so updates appear immediately when online,
-//   falls back to cache offline.
+// - network-first: small, mutable, URL-stable data (seals.json and
+//   the PWA manifest). Always tries network so updates appear
+//   immediately when online, falls back to cache offline. manifest
+//   is on this list specifically so Chrome's WebAPK update check
+//   on Android doesn't get a stale manifest through the SW.
 //
 // - stale-while-revalidate (SWR): the HTML document. Serves cached
 //   shell instantly, then refreshes in the background so the next
@@ -26,10 +28,10 @@ const urlsToCache = [
 //   most updates.
 //
 // - cache-first (default): immutable URL-addressed assets — seal
-//   images, icons, manifest. Once cached, never re-fetched while
-//   the cache is valid.
+//   images and icons. Once cached, never re-fetched while the cache
+//   is valid.
 
-const NETWORK_FIRST = ['/seals.json'];
+const NETWORK_FIRST = ['/seals.json', '/manifest.json'];
 
 function isNetworkFirst(url) {
   return NETWORK_FIRST.some(p => url.pathname.endsWith(p));

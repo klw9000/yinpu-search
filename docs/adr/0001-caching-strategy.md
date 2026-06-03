@@ -10,7 +10,7 @@
 | 资源 | 是否会变 | URL 是否随内容变化 | 用户更新感知期望 |
 |---|---|---|---|
 | `seal-image/*.jpg`、`icons/*` | 加/删，不修改 | URL 即身份（同名同内容） | 不需要"刷新" |
-| `manifest.json` | 几乎不变 | 否 | 极少更新，无所谓 |
+| `manifest.json` | 几乎不变；改了往往涉及 PWA 图标/名字 | 否 | 改了希望 Android WebAPK 能尽快感知到 |
 | `index.html`（含内嵌 CSS/JS） | 偶尔改 UI | 否 | 下次打开就要新版 |
 | `seals.json` | 每加印章都变 | 否 | 加完印章应立即可见 |
 
@@ -22,7 +22,7 @@
 
 按资源类型分三种策略，集中在 [service-worker.js](../../service-worker.js) 中：
 
-1. **cache-first**（默认）——图片、图标、manifest
+1. **cache-first**（默认）——图片、图标
    - 命中缓存即返回，未命中再走网络并写入缓存
    - 适合不可变资源：URL 就是身份，缓存命中就是正确答案
 
@@ -31,10 +31,10 @@
    - 用户**这次**看到的还是旧版，**下次**打开就是新版
    - 适合"想要新但能等一次"的资源
 
-3. **network-first**——`seals.json`
-   - 在线时永远拉网络（用户立即看到新印章），成功后写入缓存
-   - 离线时回退到缓存
-   - 适合"很小、变化频繁、用户期望立即可见"的数据
+3. **network-first**——`seals.json`、`manifest.json`
+   - 在线时永远拉网络，成功后写入缓存；离线时回退到缓存
+   - `seals.json`：用户加完印章应立即可见
+   - `manifest.json`：[未验证] Chrome 在 Android 上检查 WebAPK 是否需要重新生成时会读 manifest。如果 SW 用 cache-first 拦截了，理论上有概率给 Chrome 回旧版，从而延迟图标/名字更新——所以这里走 network-first 兜底。代价极小（manifest 只有几百字节，且只在 SW 拦截到它的 fetch 时才走网络）
 
 ## 后果
 
