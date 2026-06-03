@@ -1,0 +1,39 @@
+name: Regenerate seals.json
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'seal-image/**'
+      - 'scripts/generate-seals.sh'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: regen-seals-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  regen:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Regenerate seals.json
+        run: bash scripts/generate-seals.sh
+
+      - name: Commit and push if changed
+        run: |
+          if git diff --quiet seals.json; then
+            echo "seals.json already up to date — nothing to commit."
+            exit 0
+          fi
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add seals.json
+          git commit -m "chore: auto-regenerate seals.json"
+          git push
