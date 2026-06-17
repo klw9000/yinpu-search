@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#8B0000">
-    <title>印谱搜索</title>
+    <title>印章检索</title>
     <link rel="manifest" href="./manifest.json">
     <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon-180.png">
     <link rel="apple-touch-icon" sizes="167x167" href="./icons/apple-touch-icon-167.png">
@@ -50,6 +50,17 @@ header h1 {
 .subtitle {
     font-size: 1.1rem;
     color: #666;
+}
+
+/* Master's bio under the title. Constrained block, centered as a whole,
+   justified text reads cleaner for a CJK paragraph than ragged-center. */
+.bio {
+    font-size: 0.92rem;
+    color: #888;
+    line-height: 1.7;
+    max-width: 560px;
+    margin: 14px auto 0;
+    text-align: justify;
 }
 
 .search-section {
@@ -329,6 +340,7 @@ header h1 {
     .container { padding: 16px 12px; }
     header { margin-bottom: 18px; }
     .subtitle { font-size: 0.95rem; }
+    .bio { font-size: 0.85rem; line-height: 1.65; }
 
     .search-section,
     .results-container { padding: 16px; }
@@ -412,8 +424,8 @@ header h1 {
 <body>
     <div class="container">
         <header>
-            <h1>印谱搜索</h1>
-            <p class="subtitle">在印谱库中搜索你想要的印章</p>
+            <h1>王守桢印风</h1>
+            <p class="bio">王守桢，号海涵斋，著名篆刻家、书法家，师从钱君匋和虞愚两位大师，入古出新，印风独异。四十余年传道授业，遂有“王守桢印风”篆刻群体。</p>
         </header>
 
         <div class="search-section">
@@ -470,7 +482,7 @@ async function init() {
 
     resultsEl.innerHTML = `
         <div class="welcome-message">
-            <p>欢迎使用印谱搜索！在上方输入框中输入汉字开始搜索。</p>
+            <p>欢迎使用印章检索！在上方输入框中输入汉字开始搜索。</p>
             <p style="margin-top:10px;font-size:0.9rem;color:#aaa;">共 ${allSeals.length} 个印章可供检索</p>
         </div>
     `;
@@ -610,7 +622,7 @@ function renderResults() {
     if (searchResults.length === 0) {
         resultsContainer.innerHTML = `
             <div class="welcome-message">
-                <p>欢迎使用印谱搜索！在上方输入框中输入汉字开始搜索。</p>
+                <p>欢迎使用印章检索！在上方输入框中输入汉字开始搜索。</p>
             </div>
         `;
         return;

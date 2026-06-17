@@ -1,7 +1,7 @@
 {
-  "name": "印谱搜索",
-  "short_name": "印谱搜索",
-  "description": "印章图片搜索工具",
+  "name": "印章检索",
+  "short_name": "印章检索",
+  "description": "王守桢印风篆刻群体印章检索工具",
   "version": "1.0.0",
   "start_url": "./index.html",
   "display": "standalone",
